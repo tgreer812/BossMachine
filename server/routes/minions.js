@@ -11,14 +11,15 @@ minionsRouter.get('/', (req, res, next) => {
 
 minionsRouter.post('/', (req, res, next) => {
     let newMinion = req.body;
-    //console.log(body);
-    db.addToDatabase('minions', newMinion);
-    res.send(newMinion);
+    let added = db.addToDatabase('minions', newMinion);
+    if (added) {
+        return res.status(201).send(added);
+    }
+    res.status(400).send();
 });
 
 minionsRouter.param('minionId', (req, res, next, id) => {
     let minionId = Number(id);
-    console.log(`minion id: ${minionId}`);
     const found = db.getFromDatabaseById('minions', id);
     if (found !== null) {
         req.minion = found;
@@ -33,13 +34,19 @@ minionsRouter.get('/:minionId', (req, res, next) => {
 });
 
 minionsRouter.put('/:minionId', (req, res, next) => {
-    db.addToDatabase('minions', )
-    res.send("yeet");
+    let found = db.updateInstanceInDatabase('minions', req.body);
+    if (found) {
+        return res.send(found);
+    }
+    res.status(400).send(found);
 });
 
 minionsRouter.delete('/:minionId', (req, res, next) => {
-    console.log('yeet');
-    res.send("yeet");
+    let found = db.deleteFromDatabasebyId('minions', req.minionId);
+    if (found) {
+        return res.status(204).send();
+    }
+    res.status(404).send();
 });
 
 module.exports = minionsRouter;
